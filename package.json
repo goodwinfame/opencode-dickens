@@ -1,0 +1,38 @@
+{
+  "name": "opencode-dickens",
+  "version": "0.1.0",
+  "description": "Dickens - A long-form novel writing agent plugin for OpenCode. Named after Charles Dickens, the king of serialized novels.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src/agents",
+    "src/commands"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "ai",
+    "writing",
+    "novel",
+    "agent",
+    "dickens",
+    "long-form",
+    "fiction"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=0.1.0"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "latest",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
