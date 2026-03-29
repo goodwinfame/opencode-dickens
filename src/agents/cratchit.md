@@ -54,11 +54,48 @@ tools:
 - 主题发展方向
 - 未引爆的爆点预告
 
-## 一致性追踪
+## 一致性追踪（12 维度全覆盖）
+
+每章审校通过后，按以下清单逐项更新。**遗漏任何一项都可能导致后续章节出现一致性错误。**
 
 ### 角色状态更新
 
 每章结束后，对出场的每个角色使用 `dickens_consistency (set_character_state)`。JSON 格式详见 `src/templates/cratchit-formats.md` 中的「角色状态追踪 — JSON 格式」。
+
+需要追踪的完整字段：
+- 基础：位置、情绪、已知信息、本章变化
+- 能力/实力：`powerLevel`、`abilities`、`powerChanges`（如有突破/退步）
+- 物品/装备：`inventory`、`inventoryChanges`（如有获得/失去）
+- 身体状态：`physicalCondition`、`physicalChanges`、`appearanceNotes`（如有伤病/外貌变化）
+- 存活状态：`isAlive`、`deathChapter`、`deathCause`（如有角色死亡）
+
+### 关系状态更新
+
+角色关系发生变化时，使用 `dickens_consistency (set_relationship)`。JSON 格式详见 `src/templates/cratchit-formats.md` 中的「关系状态追踪 — JSON 格式」。
+
+关注的变化类型：结盟/反目、感情升温/冷却、信任建立/破裂、师徒/主仆关系建立或解除。
+
+### 术语表更新
+
+本章出现新的专有名词（地名、组织名、功法名、称号、特殊概念等）时，使用 `dickens_consistency (add_term)`。JSON 格式详见 `src/templates/cratchit-formats.md` 中的「术语表 — JSON 格式」。
+
+### 世界时间/环境更新
+
+每章使用 `dickens_consistency (set_world_state)` 更新故事内时间推进。JSON 格式详见 `src/templates/cratchit-formats.md` 中的「世界状态 — JSON 格式」。
+
+### 秘密/信息差更新
+
+- 新秘密产生：`dickens_consistency (add_secret)`
+- 秘密的知情人变化或揭露状态变化：`dickens_consistency (update_secret)`
+- JSON 格式详见 `src/templates/cratchit-formats.md` 中的「秘密追踪 — JSON 格式」
+
+### 阵营/组织状态更新
+
+组织/势力发生变化时（领导权更迭、合并/覆灭、联盟变动等），使用 `dickens_consistency (update_faction)`。JSON 格式详见 `src/templates/cratchit-formats.md` 中的「阵营状态 — JSON 格式」。
+
+### 承诺/契约追踪
+
+新承诺产生时，使用 `dickens_consistency (add_thread)`，`id` 以 `promise-` 开头，`name` 以 `承诺：` 或 `契约：` 开头。兑现或违约时使用 `update_thread`。
 
 ### 情节线索更新
 
@@ -70,11 +107,11 @@ tools:
 
 重要事件使用 `dickens_consistency (add_event)`。JSON 格式详见 `src/templates/cratchit-formats.md` 中的「时间线事件 — JSON 格式」。
 
-## 伏笔链追踪（新增）
+## 伏笔链追踪
 
 每条伏笔视为一个特殊的 plot thread，使用 `dickens_consistency (add_thread)` 记录。JSON 格式和状态值详见 `src/templates/cratchit-formats.md` 中的「伏笔链追踪 — JSON 格式」。
 
-## 爆点兑现追踪（新增）
+## 爆点兑现追踪
 
 每个预设爆点也视为一个 thread，使用 `dickens_consistency (add_thread)` 记录。JSON 格式和操作说明详见 `src/templates/cratchit-formats.md` 中的「爆点兑现追踪 — JSON 格式」。
 

@@ -93,17 +93,21 @@ tools:
 按以下顺序读取已保存的数据，重建完整上下文：
 
 ```
-1. dickens_status                          → 项目元数据、当前进度
-2. dickens_outline (read_synopsis)          → 创意简报
-3. dickens_outline (read_structure)         → 故事结构
-4. dickens_outline (read_arc, current)      → 当前弧段计划
-5. dickens_character (list)                 → 所有角色列表
-6. dickens_character (read, 每个主角)        → 主要角色档案
-7. dickens_world (read)                     → 世界观设定
-8. dickens_summary (read_global_summary)    → 全书概要
-9. dickens_summary (read_recent_summaries)  → 最近 3 章摘要
-10. dickens_consistency (check_open_threads) → 未关闭线索
-11. dickens_consistency (list_events, 最近5个) → 最近时间线事件
+1. dickens_status                              → 项目元数据、当前进度
+2. dickens_outline (read_synopsis)              → 创意简报
+3. dickens_outline (read_structure)              → 故事结构
+4. dickens_outline (read_arc, current)           → 当前弧段计划
+5. dickens_character (list)                      → 所有角色列表
+6. dickens_character (read, 每个主角)             → 主要角色档案
+7. dickens_world (read)                          → 世界观设定
+8. dickens_summary (read_global_summary)         → 全书概要
+9. dickens_summary (read_recent_summaries)       → 最近 3 章摘要
+10. dickens_consistency (check_open_threads)      → 未关闭线索
+11. dickens_consistency (list_events, 最近5个)    → 最近时间线事件
+12. dickens_consistency (list_terms)              → 术语表概览
+13. dickens_consistency (get_world_state)         → 最新世界状态
+14. dickens_consistency (list_factions)           → 阵营格局
+15. dickens_consistency (list_secrets)            → 活跃秘密
 ```
 
 ### 子阶段级恢复
@@ -186,6 +190,16 @@ Phase 2 拆分为 5 个子阶段，每个子阶段完成后用 `dickens_status` 
 2. **Wemmick 执行整体审查（2D）**——审查世界观与角色的一致性
 3. **检查点**：`dickens_status` 记录 `phase: "2D-complete"`
 
+#### Phase 2F：一致性数据初始化
+
+设计评审门控通过之前（或整体审查通过后），指示 @cratchit 批量初始化一致性追踪数据：
+
+1. **术语表初始化**：从 worldbuilding 文档中提取所有专有名词（地名、组织名、力量体系术语、称号等），用 `dickens_consistency (add_term)` 批量录入 `glossary.json`
+2. **阵营状态初始化**：从角色设计中的组织/势力信息，用 `dickens_consistency (add_faction)` 录入所有初始阵营到 `factions.json`
+3. **初始秘密清单**：从故事结构中的伏笔/暗线提取，用 `dickens_consistency (add_secret)` 建立初始秘密清单到 `secrets.json`
+4. **初始关系网络**：从角色设计中的关系信息，用 `dickens_consistency (set_relationship)` 录入初始关系到 `relationships.json`
+5. **初始世界状态**：用 `dickens_consistency (set_world_state)` 设置故事开篇的时间/季节/环境到 `world-state.json`
+
 #### Phase 2E：设计评审门控
 
 整体审查通过后，**调用 @jaggers 执行设计评审（维度 A1+A2+A3+B）**：
@@ -237,7 +251,7 @@ Phase 2 拆分为 5 个子阶段，每个子阶段完成后用 `dickens_status` 
 
 对每一章：
 
-1. 使用 `dickens_context` 构建写作上下文
+1. 使用 `dickens_context` 构建写作上下文（自动包含 12 维度一致性数据：项目头、本章计划、前文摘要、角色完整状态（含能力/物品/身体/存活）、文风指南、世界规则、术语表、角色关系、近期时间线、秘密/信息差、世界时间/环境、情节线索、地理/场所、阵营状态、弧段概况、全书概要）
 2. 读取弧段计划：`dickens_outline (read_arc)`
 3. 读取相关角色档案：`dickens_character (read)`
 4. 读取文风档案：`dickens_world (read)` 中的文风档案部分
@@ -269,15 +283,24 @@ Phase 2 拆分为 5 个子阶段，每个子阶段完成后用 `dickens_status` 
 
 每轮最多退回修改 **2 次**。如果第 3 次仍不通过，暂停并报告用户。
 
-### Phase 6：记录归档
+### Phase 6：记录归档（全维度追踪）
 
-审校通过后：
+审校通过后，调用 @cratchit 执行完整的 12 维度归档：
 
-1. 调用 @cratchit 生成章节摘要
-2. @cratchit 更新角色状态、情节线索、时间线
-3. @cratchit 追踪伏笔铺设和爆点兑现状态
-4. 每 5 章刷新全书概要
-5. 弧段结束时生成弧段摘要
+1. **章节摘要**：生成章节摘要（含能力变化、物品得失、秘密流转、阵营动态等新增字段）
+2. **角色完整状态**：对每个出场角色更新完整状态（位置/情绪/已知信息/能力/物品/身体/存活）
+3. **关系变化**：记录本章中发生的关系变化
+4. **术语更新**：录入本章出现的新专有名词
+5. **世界时间推进**：更新故事内日期/时段/季节/天气/环境
+6. **秘密更新**：新秘密产生或已有秘密知情人变化
+7. **阵营更新**：组织/势力状态变化
+8. **承诺/契约**：新承诺录入或已有承诺的兑现/违约
+9. **情节线索**：新线索或线索推进
+10. **时间线**：重要事件录入
+11. **伏笔链**：伏笔铺设和兑现状态
+12. **爆点追踪**：爆点蓄力或引爆状态
+13. 每 5 章刷新全书概要
+14. 弧段结束时生成弧段摘要
 
 ## 弧段边界处理
 

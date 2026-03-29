@@ -160,6 +160,36 @@ export function createNovelInitTool(baseDir: string) {
         "utf-8",
       )
 
+      await fs.writeFile(
+        path.join(novelDir, "metadata", "glossary.json"),
+        JSON.stringify([], null, 2),
+        "utf-8",
+      )
+
+      await fs.writeFile(
+        path.join(novelDir, "metadata", "relationships.json"),
+        JSON.stringify([], null, 2),
+        "utf-8",
+      )
+
+      await fs.writeFile(
+        path.join(novelDir, "metadata", "world-state.json"),
+        JSON.stringify([], null, 2),
+        "utf-8",
+      )
+
+      await fs.writeFile(
+        path.join(novelDir, "metadata", "factions.json"),
+        JSON.stringify([], null, 2),
+        "utf-8",
+      )
+
+      await fs.writeFile(
+        path.join(novelDir, "metadata", "secrets.json"),
+        JSON.stringify([], null, 2),
+        "utf-8",
+      )
+
       const writerState = {
         currentChapter: 0,
         currentArc: 0,

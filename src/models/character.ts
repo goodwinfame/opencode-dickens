@@ -26,6 +26,31 @@ export interface CharacterState {
   emotionalState: string
   knownInformation: string[]
   changes: string[]
+
+  isAlive?: boolean
+  deathChapter?: number
+  deathCause?: string
+
+  powerLevel?: string
+  abilities?: string[]
+  powerChanges?: string
+
+  inventory?: string[]
+  inventoryChanges?: string
+
+  physicalCondition?: string
+  physicalChanges?: string
+  appearanceNotes?: string
+}
+
+export interface RelationshipState {
+  sourceId: string
+  targetId: string
+  chapterNumber: number
+  type: string
+  intensity: number
+  description: string
+  change?: string
 }
 
 export interface CharacterIndex {
