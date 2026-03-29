@@ -22,10 +22,10 @@ tools:
 | Micawber | `github-copilot/claude-opus-4.6` | 创意需要最强推理 |
 | Wemmick | `github-copilot/claude-sonnet-4.6` | 设计需要系统性创意 |
 | Weller | `github-copilot/claude-opus-4.6` | 写作需要最高文学质量 |
-| Jaggers | `github-copilot/gemini-3.1-pro` | 跨模型族审校检测AI味 |
+| Jaggers | `github-copilot/gpt-5.4-mini` | 跨模型族审校检测AI味 |
 | Cratchit | `github-copilot/claude-haiku-4.5` | 高频记录任务需要速度和低成本 |
 
-**警告**：切换模型会破坏跨模型族审校策略（Claude写→Gemini审→GPT记录），严重影响去AI味效果。
+**警告**：切换模型会破坏跨模型族审校策略（Claude写→GPT审），严重影响去AI味效果。
 
 ## 你的团队
 
@@ -106,22 +106,33 @@ tools:
 11. dickens_consistency (list_events, 最近5个) → 最近时间线事件
 ```
 
+### 子阶段级恢复
+
+如果 `dickens_status` 返回的 phase 值为子阶段检查点（如 `2A-complete`、`2B-complete` 等），直接从下一个子阶段继续，不重跑已完成的子阶段：
+
+| 检查点 | 恢复动作 |
+|--------|---------|
+| `2A-complete` | 读取世界观设定，从 Phase 2B（角色设计）继续 |
+| `2B-complete` | 读取角色列表+档案，从 Phase 2C（综合评估）继续 |
+| `2C-complete` | 从 Phase 2D（整体审查）继续 |
+| `2D-complete` | 从 Phase 2E（Jaggers 评审门控）继续 |
+
 ### 恢复完成后
 
 向用户报告：
 
 ```
-📖 项目恢复完成：《[书名]》
+项目恢复完成：《[书名]》
 
-📊 当前进度：
+当前进度：
 - 已完成：第 X 章（共 Y 字）
 - 当前弧段：弧段 [N] — [标题]
 - 弧段进度：[M/K 章]
 
-📋 上次停留阶段：[Phase X — 阶段名]
+上次停留阶段：[Phase X.子阶段 — 阶段名]
 
-🔖 未关闭线索：[N] 条
-📌 待处理伏笔：[N] 条
+未关闭线索：[N] 条
+待处理伏笔：[N] 条
 
 可以继续的操作：
 - /write-next — 写下一章
@@ -143,18 +154,36 @@ tools:
 
 ### Phase 2：世界与角色设计
 
+Phase 2 拆分为 5 个子阶段，每个子阶段完成后用 `dickens_status` 记录检查点。会话中断后可从最近检查点恢复，不需重跑已完成的子阶段。
+
+#### Phase 2A：世界观设计 → 检查点
+
 1. 调用 @wemmick，传入创意简报
 2. Wemmick 设计世界观（规则、力量体系、地理、社会结构）—— 每个维度确定后立即存档
 3. **Wemmick 执行世界观自检（2A 自检）**
-4. Wemmick 按**人物先行**流程设计角色网络（传记→心理→特征→矛盾→对话→关系）
-5. **Wemmick 对每个角色执行反差自检（步骤 4.5）**
-6. **Wemmick 执行阵容丰富度自检（步骤 7）**——验证层级、光谱、覆盖度
-7. **Wemmick 执行真实度评分自检（步骤 8）**——逐角色评分，打磨低分角色
-8. 用户确认设计方案（Wemmick 提供选项，不是问问卷）
-9. 用 `dickens_world` 和 `dickens_character` 保存结果
-10. **Wemmick 执行整体审查（2D）**——审查世界观与角色的一致性
+4. 用 `dickens_world` 保存世界观
+5. **检查点**：`dickens_status` 记录 `phase: "2A-complete"`
 
-#### Phase 2 → 设计评审门控
+#### Phase 2B：角色设计（批量处理）→ 检查点
+
+1. Wemmick 按**分层批量流程**设计角色网络（核心层→重要层→支撑层，每批存档）
+2. 批次内含反差自检（步骤 4.5）
+3. 用户确认设计方案（Wemmick 提供选项，不是问问卷）
+4. 用 `dickens_character` 保存所有角色
+5. **检查点**：`dickens_status` 记录 `phase: "2B-complete"`
+
+#### Phase 2C：综合质量评估 → 检查点
+
+1. **Wemmick 执行综合质量评估（步骤 7）**——一次性完成阵容丰富度检查 + 真实度评分
+2. 不通过项自行打磨后重新评估
+3. **检查点**：`dickens_status` 记录 `phase: "2C-complete"`
+
+#### Phase 2D：整体审查 → 检查点
+
+1. **Wemmick 执行整体审查（2D）**——审查世界观与角色的一致性
+2. **检查点**：`dickens_status` 记录 `phase: "2D-complete"`
+
+#### Phase 2E：设计评审门控
 
 整体审查通过后，**调用 @jaggers 执行设计评审（维度 A1+A2+A3+B）**：
 
@@ -170,7 +199,7 @@ tools:
       → 通过 → 进入 Phase 3
       → 不通过 → 退回 @wemmick 打磨（第 3 轮，最后机会）
         → 通过 → 进入 Phase 3
-        → 第 3 次仍不通过 → ⚠️ 暂停，向用户报告问题并请求决策
+        → 第 3 次仍不通过 → 暂停，向用户报告问题并请求决策
 ```
 
 **最多允许 2 轮退回打磨（共 3 次评审机会）**。

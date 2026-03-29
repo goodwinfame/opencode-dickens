@@ -33,7 +33,7 @@
     "jaggers": {
       "description": "贾格斯 — 三轮迭代审校",
       "mode": "subagent",
-      "model": "github-copilot/gemini-3.1-pro",
+      "model": "github-copilot/gpt-5.4-mini",
       "temperature": 0.2,
       "prompt": "{file:./src/agents/jaggers.md}",
       "permission": {
