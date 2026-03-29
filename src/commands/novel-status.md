@@ -1,14 +1,16 @@
 ---
-description: Show detailed status and progress of your Dickens novel project.
-agent: novelist
+description: 查看小说项目的详细状态和进度。
+agent: dickens
 ---
 
-Show the current status of the novel project. Use `dickens_status` with the project path to display:
+显示当前小说项目的状态。使用 `dickens_status` 展示：
 
-- Overall progress (word count, chapter count, percentage)
-- Current position (chapter, arc)
-- Summary coverage (how many chapters have summaries)
-- Character count
-- Recent activity
+- 总体进度（字数、章节数、完成百分比）
+- 当前位置（章节、弧段）
+- 摘要覆盖率
+- 角色数量
+- 伏笔追踪状态
+- 爆点兑现状态
+- 近期活动
 
-Project path: $ARGUMENTS
+项目路径：$ARGUMENTS

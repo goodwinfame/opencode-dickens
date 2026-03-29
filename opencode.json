@@ -1,44 +1,51 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-dickens"],
+  "model": "github-copilot/claude-sonnet-4.6",
   "agent": {
-    "novelist": {
-      "description": "Main orchestrator for Dickens novel writing system",
+    "dickens": {
+      "description": "总指挥 — 编排六阶段写作流程",
       "mode": "primary",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.4,
-      "prompt": "{file:./src/agents/novelist.md}"
-    },
-    "architect": {
-      "description": "Story architect — designs structure, characters, and world",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.7,
-      "prompt": "{file:./src/agents/architect.md}"
-    },
-    "scribe": {
-      "description": "Writing craftsman — generates chapter prose",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "temperature": 0.8,
-      "prompt": "{file:./src/agents/scribe.md}"
-    },
-    "editor": {
-      "description": "Quality reviewer — checks prose, consistency, and pacing",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
+      "model": "github-copilot/claude-sonnet-4.6",
       "temperature": 0.3,
-      "prompt": "{file:./src/agents/editor.md}",
+      "prompt": "{file:./src/agents/dickens.md}"
+    },
+    "micawber": {
+      "description": "米考伯 — 创意脑暴引擎",
+      "mode": "subagent",
+      "model": "github-copilot/claude-opus-4.6",
+      "temperature": 0.9,
+      "prompt": "{file:./src/agents/micawber.md}"
+    },
+    "wemmick": {
+      "description": "威米克 — 世界/角色/结构设计师",
+      "mode": "subagent",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "temperature": 0.6,
+      "prompt": "{file:./src/agents/wemmick.md}"
+    },
+    "weller": {
+      "description": "维勒 — 章节写作匠人",
+      "mode": "subagent",
+      "model": "github-copilot/claude-opus-4.6",
+      "temperature": 0.8,
+      "prompt": "{file:./src/agents/weller.md}"
+    },
+    "jaggers": {
+      "description": "贾格斯 — 三轮迭代审校",
+      "mode": "subagent",
+      "model": "github-copilot/gemini-3.1-pro",
+      "temperature": 0.2,
+      "prompt": "{file:./src/agents/jaggers.md}",
       "permission": {
         "edit": "deny"
       }
     },
-    "chronicler": {
-      "description": "Context manager — generates summaries and tracks consistency",
+    "cratchit": {
+      "description": "克拉奇特 — 上下文管理与编年记录",
       "mode": "subagent",
-      "model": "anthropic/claude-haiku-4-20250514",
+      "model": "github-copilot/claude-haiku-4.5",
       "temperature": 0.2,
-      "prompt": "{file:./src/agents/chronicler.md}"
+      "prompt": "{file:./src/agents/cratchit.md}"
     }
   }
 }

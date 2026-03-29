@@ -1,33 +1,34 @@
 ---
-description: Start a new Dickens novel project. Launches the Architect agent to interview you and design the story.
-agent: novelist
+description: 启动 Dickens 创作流程。从灵感碰撞开始，经过世界设计、角色设计、结构规划，直到准备好写作。
+agent: dickens
 ---
 
-Start a new novel project with Dickens. Follow these steps:
+启动一个新的 Dickens 小说创作项目。流程如下：
 
-1. First, ask me about the novel I want to write:
-   - Title
-   - Genre and subgenre
-   - Target word count (default: 500,000 characters)
-   - Language (default: Chinese)
-   - Basic premise
+## Phase 1：灵感碰撞
 
-2. Use `dickens_init` to create the project structure with my answers.
+1. 先问我想写什么——可以是一个模糊的想法、一个关键词、一句灵感
+2. 使用 `dickens_init` 创建项目结构
+3. 调用 @micawber 进行创意脑暴：
+   - Micawber 会生成 3-5 个差异化概念方案
+   - 我来挑选和组合
+   - 通过 What-if 推演深挖
+   - 最终产出创意简报
 
-3. Then invoke @architect to conduct a detailed story planning interview covering:
-   - Core vision and premise
-   - Characters and relationships
-   - World building and setting
-   - Story structure and arc planning
-   - Writing style preferences
+## Phase 2：世界与角色设计
 
-4. After the interview, @architect will generate:
-   - Synopsis
-   - Chapter outline (organized by arcs)
-   - Character profiles
-   - World building documents
-   - Style guide
+4. 调用 @wemmick，基于创意简报设计：
+   - 世界观（力量体系、社会结构、地理、历史）
+   - 角色网络（内在矛盾、关系张力、对话个性）
+   - Wemmick 会提供方案选项让我选择
 
-5. Present the plan for my review and approval.
+## Phase 3：结构设计
+
+5. 继续由 @wemmick 执行：
+   - 故事结构选择
+   - 弧段规划和章节计划
+   - 爆点路线图和伏笔链设计
+
+6. 呈现完整的设计方案供我审核批准
 
 $ARGUMENTS

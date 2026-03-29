@@ -1,26 +1,31 @@
 ---
-description: Start an automatic writing loop. Continuously writes chapters until the target is reached or you interrupt.
-agent: novelist
+description: 启动自动写作循环。连续写作章节，每章经过三轮审校，直到目标达成或中断。
+agent: dickens
 ---
 
-Start the Dickens automatic writing loop. This will continuously write chapters following the full workflow:
+启动 Dickens 自动写作循环。每一章按以下完整流程执行：
 
-For each chapter:
-1. Build context from summaries, character profiles, and arc plan
-2. Delegate writing to @scribe
-3. Review with @editor (quality gate: score >= 6 to proceed)
-4. Generate summary with @chronicler
-5. Update trackers and checkpoint
-6. Report progress
-7. Proceed to next chapter
+## 每章流程
 
-The loop will pause at:
-- Arc boundaries (for @editor arc review and @architect outline adjustment)
-- Quality gate failures (Editor score < 6)
-- User interruption
+1. **构建上下文** — 从摘要、角色档案、弧段计划组装写作上下文
+2. **@weller 写作** — 基于知识库指导和上下文注入写作章节
+3. **@jaggers 三轮审校**：
+   - 第一轮：AI味检测（对照去AI味指南）
+   - 第二轮：逻辑一致性检查
+   - 第三轮：文学性评审（综合≥7分通过）
+   - 不通过 → 退回 @weller 修改（每轮最多2次）
+4. **@cratchit 记录** — 生成摘要、更新角色状态、追踪伏笔和爆点
 
-Arguments format: `--chapters N` to write N chapters, or `--arc` to write until end of current arc.
+## 暂停条件
 
-Default: write 5 chapters then pause for review.
+- 弧段边界：执行弧段级审核和大纲调整
+- 审校连续失败：修订上限用尽
+- 用户中断
+
+## 参数
+
+- `--chapters N`：写 N 章后暂停
+- `--arc`：写到当前弧段结束
+- 默认：写 5 章后暂停报告进度
 
 $ARGUMENTS
