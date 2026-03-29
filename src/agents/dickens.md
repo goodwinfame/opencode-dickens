@@ -151,6 +151,7 @@ tools:
 4. Micawber 输出 3-5 个方案 → 用户挑选 → 深化讨论 → 产出创意简报
 5. 用 `dickens_outline (set_synopsis)` 保存创意简报
 6. **验证 Micawber 已完成存档**
+7. **热梗采集**（条件触发）：如果创意简报的基调/类型表明需要网络文化元素（都市、爽文、轻喜剧等现代题材），使用 bash 工具搜索当下流行的网络梗/俚语/谐音梗，整理后存入 `project/knowledge/trending-culture.md`。格式参见 `internet-culture.md` 的"项目热梗库"章节。古代/异世界/严肃文学题材跳过此步
 
 ### Phase 2：世界与角色设计
 
@@ -179,10 +180,11 @@ Phase 2 拆分为 5 个子阶段，每个子阶段完成后用 `dickens_status` 
 2. 不通过项自行打磨后重新评估
 3. **检查点**：`dickens_status` 记录 `phase: "2C-complete"`
 
-#### Phase 2D：整体审查 → 检查点
+#### Phase 2D：文风档案 + 整体审查 → 检查点
 
-1. **Wemmick 执行整体审查（2D）**——审查世界观与角色的一致性
-2. **检查点**：`dickens_status` 记录 `phase: "2D-complete"`
+1. **Wemmick 设计文风档案**——基于创意简报和已完成的世界观/角色，产出文风档案（叙事视角、语气、幽默类型、网络语言浓度、标杆参考、示范段落等），用户确认后持久化保存
+2. **Wemmick 执行整体审查（2D）**——审查世界观与角色的一致性
+3. **检查点**：`dickens_status` 记录 `phase: "2D-complete"`
 
 #### Phase 2E：设计评审门控
 
@@ -238,8 +240,10 @@ Phase 2 拆分为 5 个子阶段，每个子阶段完成后用 `dickens_status` 
 1. 使用 `dickens_context` 构建写作上下文
 2. 读取弧段计划：`dickens_outline (read_arc)`
 3. 读取相关角色档案：`dickens_character (read)`
-4. 调用 @weller 写作，传入完整上下文
-5. 使用 `dickens_write_chapter` 保存章节
+4. 读取文风档案：`dickens_world (read)` 中的文风档案部分
+5. 如果项目有热梗库（`project/knowledge/trending-culture.md`），注入相关内容
+6. 调用 @weller 写作，传入完整上下文（含文风档案和热梗库）
+7. 使用 `dickens_write_chapter` 保存章节
 
 ### Phase 5：三轮审校
 
@@ -283,6 +287,7 @@ Phase 2 拆分为 5 个子阶段，每个子阶段完成后用 `dickens_status` 
 2. 用 `dickens_consistency (check_open_threads)` 检查未关闭线索
 3. 调用 @wemmick 审视后续弧段规划，做必要调整
 4. 由 @cratchit 生成弧段摘要和全局摘要更新
+5. **热梗库刷新**（可选）：如果项目有热梗库且距上次采集已超过 30 天，重新搜索并更新 `project/knowledge/trending-culture.md`
 
 ## 写作循环模式
 
