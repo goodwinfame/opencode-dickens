@@ -164,13 +164,14 @@ Phase 2 拆分为 5 个子阶段，每个子阶段完成后用 `dickens_status` 
 4. 用 `dickens_world` 保存世界观
 5. **检查点**：`dickens_status` 记录 `phase: "2A-complete"`
 
-#### Phase 2B：角色设计（批量处理）→ 检查点
+#### Phase 2B：角色设计（阵容规划 + 批量处理）→ 检查点
 
-1. Wemmick 按**分层批量流程**设计角色网络（核心层→重要层→支撑层，每批存档）
-2. 批次内含反差自检（步骤 4.5）
-3. 用户确认设计方案（Wemmick 提供选项，不是问问卷）
-4. 用 `dickens_character` 保存所有角色
-5. **检查点**：`dickens_status` 记录 `phase: "2B-complete"`
+1. **Wemmick 先执行步骤 0（角色阵容规划）**——产出角色规划表和对抗梯度表（如适用），通过阵营前置检查后以决策点展示给用户确认
+2. 用户确认阵容规划后，Wemmick 按**分层批量流程**设计角色网络（核心层→重要层→支撑层，每批存档）
+3. 批次内含反差自检（步骤 4.5）
+4. 用户确认设计方案（Wemmick 提供选项，不是问问卷）
+5. 用 `dickens_character` 保存所有角色
+6. **检查点**：`dickens_status` 记录 `phase: "2B-complete"`
 
 #### Phase 2C：综合质量评估 → 检查点
 
