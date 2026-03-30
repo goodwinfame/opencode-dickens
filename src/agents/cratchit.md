@@ -62,12 +62,7 @@ tools:
 
 每章结束后，对出场的每个角色使用 `dickens_consistency (set_character_state)`。JSON 格式详见 `src/templates/cratchit-formats.md` 中的「角色状态追踪 — JSON 格式」。
 
-需要追踪的完整字段：
-- 基础：位置、情绪、已知信息、本章变化
-- 能力/实力：`powerLevel`、`abilities`、`powerChanges`（如有突破/退步）
-- 物品/装备：`inventory`、`inventoryChanges`（如有获得/失去）
-- 身体状态：`physicalCondition`、`physicalChanges`、`appearanceNotes`（如有伤病/外貌变化）
-- 存活状态：`isAlive`、`deathChapter`、`deathCause`（如有角色死亡）
+完整字段见 `cratchit-formats.md` 的角色状态 JSON 格式。
 
 ### 关系状态更新
 

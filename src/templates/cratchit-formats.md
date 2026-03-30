@@ -113,31 +113,16 @@
 
 ```json
 {
-  "characterId": "角色ID",
-  "chapterNumber": N,
-  "location": "当前位置",
-  "emotionalState": "情感状态",
-  "knownInformation": ["角色当前知道的重要信息"],
-  "changes": ["本章发生的变化"],
-
-  "isAlive": true,
-  "deathChapter": null,
-  "deathCause": null,
-
-  "powerLevel": "实力等级（如'筑基中期'、'黄金三星'，无则省略）",
-  "abilities": ["当前掌握的技能/能力列表"],
-  "powerChanges": "本章实力变化（如'突破至结丹期'，无则省略）",
-
-  "inventory": ["当前持有的关键物品/装备"],
-  "inventoryChanges": "本章物品变化（如'获得[冰魄寒剑]'，无则省略）",
-
-  "physicalCondition": "身体状态（如'左臂断裂未愈'，正常则省略）",
-  "physicalChanges": "本章身体变化（无则省略）",
-  "appearanceNotes": "外貌变化备注（如'剃了光头'，无则省略）"
+  "characterId": "", "chapterNumber": 0,
+  "location": "", "emotionalState": "", "knownInformation": [], "changes": [],
+  "isAlive": true, "deathChapter": null, "deathCause": null,
+  "powerLevel": "", "abilities": [], "powerChanges": "",
+  "inventory": [], "inventoryChanges": "",
+  "physicalCondition": "", "physicalChanges": "", "appearanceNotes": ""
 }
 ```
 
-> 字段均为可选（除 characterId、chapterNumber、location、emotionalState、knownInformation、changes）。isAlive 默认 true，仅角色死亡时设为 false。
+> 必填：characterId/chapterNumber/location/emotionalState/knownInformation/changes。其余可选，无变化则省略。isAlive 默认 true。
 
 ---
 
@@ -145,17 +130,13 @@
 
 ```json
 {
-  "sourceId": "角色A的ID",
-  "targetId": "角色B的ID",
-  "chapterNumber": N,
-  "type": "关系类型（盟友/敌对/暧昧/师徒/陌生/结义/主仆等）",
-  "intensity": 3,
-  "description": "当前关系的一句话描述",
-  "change": "本章的关系变化（如有）"
+  "sourceId": "", "targetId": "", "chapterNumber": 0,
+  "type": "盟友|敌对|暧昧|师徒|陌生|结义|主仆|...",
+  "intensity": 3, "description": "", "change": ""
 }
 ```
 
-> `intensity` 为 1-5，1=极弱/刚接触，5=至深/不可调和。`change` 仅在本章关系有变化时填写。
+> intensity 1-5（1=极弱，5=至深）。change 仅关系有变化时填写。
 
 ---
 
@@ -163,13 +144,9 @@
 
 ```json
 {
-  "id": "唯一ID（如 term-ice-sword）",
-  "term": "术语全名",
-  "aliases": ["别名1", "简称2"],
+  "id": "term-xxx", "term": "", "aliases": [],
   "category": "location|organization|power_system|title|object|concept|custom",
-  "definition": "一句话定义",
-  "firstAppearance": N,
-  "constraints": "使用约束（如'仅在XX情境下使用'，无则省略）"
+  "definition": "", "firstAppearance": 0, "constraints": ""
 }
 ```
 
@@ -179,17 +156,12 @@
 
 ```json
 {
-  "chapterNumber": N,
-  "inStoryDate": "故事内日期（如'大衍历3027年秋'、'末日第47天'）",
-  "season": "季节",
-  "weather": "天气/环境状况",
-  "timeOfDay": "时段（晨/午/夜）",
-  "majorWorldEvents": "正在发生的大事件（如'南境战争第三年'）",
-  "environmentNotes": "环境特殊状况（如'瘟疫蔓延中'、'灵气潮汐期'）"
+  "chapterNumber": 0, "inStoryDate": "", "season": "",
+  "weather": "", "timeOfDay": "", "majorWorldEvents": "", "environmentNotes": ""
 }
 ```
 
-> 所有字段除 chapterNumber 外均可选。每章至少更新 inStoryDate 和 timeOfDay。
+> 除 chapterNumber 外均可选。每章至少更新 inStoryDate 和 timeOfDay。
 
 ---
 
@@ -197,17 +169,11 @@
 
 ```json
 {
-  "factionId": "阵营唯一ID",
-  "name": "阵营名称",
-  "chapterNumber": N,
+  "factionId": "", "name": "", "chapterNumber": 0,
   "status": "active|weakened|destroyed|merged|hidden",
-  "leader": "当前领袖角色ID",
-  "keyMembers": ["核心成员角色ID"],
-  "territory": "控制区域",
-  "alliances": [
-    { "targetFaction": "另一阵营ID", "type": "allied|hostile|neutral|vassal" }
-  ],
-  "changes": "本章变化描述"
+  "leader": "", "keyMembers": [], "territory": "",
+  "alliances": [{ "targetFaction": "", "type": "allied|hostile|neutral|vassal" }],
+  "changes": ""
 }
 ```
 
@@ -217,18 +183,14 @@
 
 ```json
 {
-  "id": "secret-xxx",
-  "description": "秘密内容",
-  "introducedChapter": N,
-  "knownBy": ["知道此秘密的角色ID列表"],
-  "unknownBy": ["明确不知道此秘密的关键角色（可选）"],
-  "revealedChapter": null,
+  "id": "secret-xxx", "description": "", "introducedChapter": 0,
+  "knownBy": [], "unknownBy": [], "revealedChapter": null,
   "status": "active|partially_revealed|fully_revealed",
   "significance": "minor|major|critical"
 }
 ```
 
-> 秘密被某角色获知时，用 `update_secret` 将该角色加入 `knownBy`。秘密完全揭露时改 `status` 为 `fully_revealed` 并填写 `revealedChapter`。
+> 角色获知秘密 → `update_secret` 加入 knownBy。完全揭露 → status 改 fully_revealed + 填 revealedChapter。
 
 ---
 
@@ -236,13 +198,8 @@
 
 ```json
 {
-  "id": "唯一ID",
-  "chapter": N,
-  "timestamp": "故事内时间",
-  "description": "事件描述",
-  "characters": ["涉及角色"],
-  "location": "发生地点",
-  "significance": "minor|moderate|major|critical"
+  "id": "", "chapter": 0, "timestamp": "", "description": "",
+  "characters": [], "location": "", "significance": "minor|moderate|major|critical"
 }
 ```
 
@@ -252,17 +209,12 @@
 
 ```json
 {
-  "id": "foreshadow-xxx",
-  "name": "伏笔：[描述]",
-  "description": "铺设内容 | 误导方向 | 真相",
-  "introducedChapter": N,
-  "status": "open",
-  "relatedCharacters": ["关联角色"],
-  "targetChapter": "预计兑现章节(约)"
+  "id": "foreshadow-xxx", "name": "伏笔：...", "description": "铺设|误导|真相",
+  "introducedChapter": 0, "status": "open", "relatedCharacters": [], "targetChapter": ""
 }
 ```
 
-伏笔状态值：`open`（已铺设）→ `developing`（有更多暗示）→ `climax`（即将揭示）→ `resolved`（已兑现）
+状态值：`open` → `developing` → `climax` → `resolved`
 
 ---
 
@@ -270,13 +222,10 @@
 
 ```json
 {
-  "id": "explosion-xxx",
-  "name": "爆点：[描述]",
-  "description": "类型：[反转/揭示/情感/能力/选择/牺牲] | 蓄力状态",
-  "introducedChapter": N,
-  "status": "open",
-  "relatedCharacters": ["关联角色"]
+  "id": "explosion-xxx", "name": "爆点：...",
+  "description": "类型：反转|揭示|情感|能力|选择|牺牲 | 蓄力状态",
+  "introducedChapter": 0, "status": "open", "relatedCharacters": []
 }
 ```
 
-蓄力过程中，通过 `update_thread` 更新描述，记录蓄力进度。引爆后改为 `resolved`。
+蓄力中用 `update_thread` 记录进度。引爆后改 `resolved`。
