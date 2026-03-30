@@ -3,25 +3,7 @@ import { promises as fs } from "fs"
 import path from "path"
 import type { NovelProject } from "../models/novel.js"
 import type { WriterState } from "../models/outline.js"
-
-async function discoverProjectDir(startDir: string): Promise<string | null> {
-  const directCheck = path.join(startDir, "novel.json")
-  const exists = await fs.access(directCheck).then(() => true).catch(() => false)
-  if (exists) return startDir
-
-  try {
-    const entries = await fs.readdir(startDir, { withFileTypes: true })
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue
-      const subCheck = path.join(startDir, entry.name, "novel.json")
-      const subExists = await fs.access(subCheck).then(() => true).catch(() => false)
-      if (subExists) return path.join(startDir, entry.name)
-    }
-  } catch {
-    // directory unreadable
-  }
-  return null
-}
+import { resolveProjectDir } from "./resolve-project.js"
 
 export function createNovelStatusTool(baseDir: string) {
   return tool({
@@ -34,13 +16,9 @@ export function createNovelStatusTool(baseDir: string) {
     },
     async execute(args, context) {
       try {
-        const rawDir = path.isAbsolute(args.projectPath)
-          ? args.projectPath
-          : path.join(context.directory || baseDir, args.projectPath)
-
-        const projectDir = await discoverProjectDir(rawDir)
+        const projectDir = await resolveProjectDir(args.projectPath, context.directory, baseDir)
         if (!projectDir) {
-          return `No novel project found at ${rawDir} (also checked child directories). Use dickens_init to create one.`
+          return `No novel project found at ${args.projectPath} (also checked child directories). Use dickens_init to create one.`
         }
 
         const novelJsonPath = path.join(projectDir, "novel.json")

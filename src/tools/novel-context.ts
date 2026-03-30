@@ -1,6 +1,6 @@
 import { tool } from "@opencode-ai/plugin"
-import path from "path"
 import { ContextBuilder } from "../context/context-builder.js"
+import { resolveProjectDir } from "./resolve-project.js"
 
 export function createNovelContextTool(baseDir: string) {
   return tool({
@@ -11,12 +11,15 @@ export function createNovelContextTool(baseDir: string) {
       chapterNumber: tool.schema.number("Chapter number to build context for"),
     },
     async execute(args, context) {
-      const projectDir = path.isAbsolute(args.projectPath)
-        ? args.projectPath
-        : path.join(context.directory || baseDir, args.projectPath)
+      try {
+        const projectDir = await resolveProjectDir(args.projectPath, context.directory, baseDir)
+        if (!projectDir) return `Error: No novel project found. Use dickens_init first.`
 
-      const builder = new ContextBuilder(projectDir)
-      return builder.buildWritingContext(args.chapterNumber)
+        const builder = new ContextBuilder(projectDir)
+        return builder.buildWritingContext(args.chapterNumber)
+      } catch (e) {
+        return `Error in dickens_context: ${(e as Error).message}`
+      }
     },
   })
 }

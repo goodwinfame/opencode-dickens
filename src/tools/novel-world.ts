@@ -1,6 +1,7 @@
 import { tool } from "@opencode-ai/plugin"
 import { promises as fs } from "fs"
 import path from "path"
+import { resolveProjectDir } from "./resolve-project.js"
 
 export function createNovelWorldTool(baseDir: string) {
   return tool({
@@ -16,9 +17,9 @@ export function createNovelWorldTool(baseDir: string) {
       ),
     },
     async execute(args, context) {
-      const projectDir = path.isAbsolute(args.projectPath)
-        ? args.projectPath
-        : path.join(context.directory || baseDir, args.projectPath)
+      try {
+      const projectDir = await resolveProjectDir(args.projectPath, context.directory, baseDir)
+      if (!projectDir) return `Error: No novel project found. Use dickens_init first.`
 
       const worldDir = path.join(projectDir, "worldbuilding")
 
@@ -50,6 +51,9 @@ export function createNovelWorldTool(baseDir: string) {
       await fs.mkdir(worldDir, { recursive: true })
       await fs.writeFile(filePath, args.content, "utf-8")
       return `${fileName} updated successfully.`
+      } catch (e) {
+        return `Error in dickens_world: ${(e as Error).message}`
+      }
     },
   })
 }

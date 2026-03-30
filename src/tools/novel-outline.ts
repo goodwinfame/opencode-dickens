@@ -1,6 +1,7 @@
 import { tool } from "@opencode-ai/plugin"
 import { promises as fs } from "fs"
 import path from "path"
+import { resolveProjectDir } from "./resolve-project.js"
 
 export function createNovelOutlineTool(baseDir: string) {
   return tool({
@@ -20,9 +21,8 @@ export function createNovelOutlineTool(baseDir: string) {
     },
     async execute(args, context) {
       try {
-        const projectDir = path.isAbsolute(args.projectPath)
-          ? args.projectPath
-          : path.join(context.directory || baseDir, args.projectPath)
+        const projectDir = await resolveProjectDir(args.projectPath, context.directory, baseDir)
+        if (!projectDir) return `Error: No novel project found. Use dickens_init first.`
 
         const outlineDir = path.join(projectDir, "outline")
 

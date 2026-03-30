@@ -5,6 +5,7 @@ import type { PlotThread, TimelineEvent } from "../models/outline.js"
 import type { CharacterState, RelationshipState } from "../models/character.js"
 import type { GlossaryEntry } from "../models/glossary.js"
 import type { WorldState, FactionState, Secret } from "../models/world-state.js"
+import { resolveProjectDir } from "./resolve-project.js"
 
 export function createNovelConsistencyTool(baseDir: string) {
   return tool({
@@ -21,9 +22,8 @@ export function createNovelConsistencyTool(baseDir: string) {
     },
     async execute(args, context) {
       try {
-      const projectDir = path.isAbsolute(args.projectPath)
-        ? args.projectPath
-        : path.join(context.directory || baseDir, args.projectPath)
+      const projectDir = await resolveProjectDir(args.projectPath, context.directory, baseDir)
+      if (!projectDir) return `Error: No novel project found. Use dickens_init first.`
 
       const metadataDir = path.join(projectDir, "metadata")
       const threadsPath = path.join(metadataDir, "threads.json")
