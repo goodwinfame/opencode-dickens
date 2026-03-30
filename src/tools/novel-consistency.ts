@@ -20,6 +20,7 @@ export function createNovelConsistencyTool(baseDir: string) {
       ),
     },
     async execute(args, context) {
+      try {
       const projectDir = path.isAbsolute(args.projectPath)
         ? args.projectPath
         : path.join(context.directory || baseDir, args.projectPath)
@@ -404,6 +405,9 @@ export function createNovelConsistencyTool(baseDir: string) {
         default:
           return `Unknown action: ${args.action}. Valid: add_thread, update_thread, list_threads, check_open_threads, add_event, list_events, set_character_state, get_character_state, add_term, update_term, search_terms, list_terms, set_relationship, get_relationships, list_relationship_changes, set_world_state, get_world_state, add_faction, update_faction, list_factions, add_secret, update_secret, list_secrets`
       }
+      } catch (e) {
+        return `Error in dickens_consistency: ${(e as Error).message}`
+      }
     },
   })
 }
@@ -417,5 +421,6 @@ async function readJson<T>(filePath: string): Promise<T[]> {
 }
 
 async function writeJson(filePath: string, data: unknown): Promise<void> {
+  await fs.mkdir(path.dirname(filePath), { recursive: true })
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8")
 }

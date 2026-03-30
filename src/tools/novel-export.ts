@@ -21,94 +21,99 @@ export function createNovelExportTool(baseDir: string) {
       ),
     },
     async execute(args, context) {
-      const projectDir = path.isAbsolute(args.projectPath)
-        ? args.projectPath
-        : path.join(context.directory || baseDir, args.projectPath)
-
-      const novelPath = path.join(projectDir, "novel.json")
-      let project: NovelProject
       try {
-        project = JSON.parse(await fs.readFile(novelPath, "utf-8"))
-      } catch {
-        return `No novel project found at ${projectDir}.`
-      }
+        const projectDir = path.isAbsolute(args.projectPath)
+          ? args.projectPath
+          : path.join(context.directory || baseDir, args.projectPath)
 
-      const chaptersDir = path.join(projectDir, "chapters")
-      let chapterFiles: string[]
-      try {
-        chapterFiles = (await fs.readdir(chaptersDir))
-          .filter((f) => f.endsWith(".md"))
-          .sort()
-      } catch {
-        return "No chapters found to export."
-      }
+        const novelPath = path.join(projectDir, "novel.json")
+        let project: NovelProject
+        try {
+          project = JSON.parse(await fs.readFile(novelPath, "utf-8"))
+        } catch {
+          return `No novel project found at ${projectDir}.`
+        }
 
-      if (args.startChapter || args.endChapter) {
-        const start = args.startChapter ?? 1
-        const end = args.endChapter ?? 9999
-        chapterFiles = chapterFiles.filter((f) => {
-          const num = parseInt(f.replace(".md", ""), 10)
-          return num >= start && num <= end
-        })
-      }
+        const chaptersDir = path.join(projectDir, "chapters")
+        let chapterFiles: string[]
+        try {
+          chapterFiles = (await fs.readdir(chaptersDir))
+            .filter((f) => f.endsWith(".md"))
+            .sort()
+        } catch {
+          return "No chapters found to export."
+        }
 
-      if (chapterFiles.length === 0) return "No chapters in the specified range."
+        if (args.startChapter || args.endChapter) {
+          const start = args.startChapter ?? 1
+          const end = args.endChapter ?? 9999
+          chapterFiles = chapterFiles.filter((f) => {
+            const num = parseInt(f.replace(".md", ""), 10)
+            return num >= start && num <= end
+          })
+        }
 
-      const chapters: string[] = []
-      let totalWords = 0
+        if (chapterFiles.length === 0) return "No chapters in the specified range."
 
-      for (const file of chapterFiles) {
-        const content = await fs.readFile(
-          path.join(chaptersDir, file),
-          "utf-8",
+        const chapters: string[] = []
+        let totalWords = 0
+
+        for (const file of chapterFiles) {
+          const content = await fs.readFile(
+            path.join(chaptersDir, file),
+            "utf-8",
+          )
+          chapters.push(content)
+          totalWords += content.replace(/\s/g, "").length
+        }
+
+        const ext = args.format === "txt" ? "txt" : "md"
+        const defaultOutput = path.join(
+          projectDir,
+          `${project.title}-export.${ext}`,
         )
-        chapters.push(content)
-        totalWords += content.replace(/\s/g, "").length
-      }
+        const outputPath = args.outputPath ?? defaultOutput
 
-      const ext = args.format === "txt" ? "txt" : "md"
-      const defaultOutput = path.join(
-        projectDir,
-        `${project.title}-export.${ext}`,
-      )
-      const outputPath = args.outputPath ?? defaultOutput
+        let output: string
+        if (args.format === "txt") {
+          output = [
+            project.title,
+            "=".repeat(project.title.length * 2),
+            "",
+            ...chapters.map((c) => {
+              return (
+                c
+                  .replace(/^#+\s*/gm, "")
+                  .replace(/\*\*/g, "")
+                  .replace(/\*/g, "") + "\n\n"
+              )
+            }),
+          ].join("\n")
+        } else {
+          output = [
+            `# ${project.title}`,
+            "",
+            `> ${project.genre}${project.subGenre ? ` / ${project.subGenre}` : ""}`,
+            "",
+            "---",
+            "",
+            ...chapters.map((c) => c + "\n\n---\n"),
+          ].join("\n")
+        }
 
-      let output: string
-      if (args.format === "txt") {
-        output = [
-          project.title,
-          "=".repeat(project.title.length * 2),
-          "",
-          ...chapters.map((c) => {
-            return (
-              c
-                .replace(/^#+\s*/gm, "")
-                .replace(/\*\*/g, "")
-                .replace(/\*/g, "") + "\n\n"
-            )
-          }),
+        await fs.mkdir(path.dirname(outputPath), { recursive: true })
+        await fs.writeFile(outputPath, output, "utf-8")
+
+        return [
+          `Novel exported successfully.`,
+          `Format: ${args.format}`,
+          `Output: ${outputPath}`,
+          `Chapters: ${chapterFiles.length}`,
+          `Total characters: ${totalWords.toLocaleString()}`,
         ].join("\n")
-      } else {
-        output = [
-          `# ${project.title}`,
-          "",
-          `> ${project.genre}${project.subGenre ? ` / ${project.subGenre}` : ""}`,
-          "",
-          "---",
-          "",
-          ...chapters.map((c) => c + "\n\n---\n"),
-        ].join("\n")
+      } catch (e) {
+        return `Error in dickens_export: ${(e as Error).message}`
       }
-
-      await fs.writeFile(outputPath, output, "utf-8")
-
-      return [
-        `Novel exported successfully.`,
-        `Format: ${args.format}`,
-        `Output: ${outputPath}`,
-        `Chapters: ${chapterFiles.length}`,
-        `Total characters: ${totalWords.toLocaleString()}`,
-      ].join("\n")
     },
   })
 }
