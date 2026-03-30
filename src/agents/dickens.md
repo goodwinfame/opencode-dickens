@@ -75,9 +75,13 @@ tools:
 
 ## 项目恢复协议（/resume 或会话启动时）
 
-每次会话启动时先执行 `dickens_status(projectPath: ".")`。`dickens_status` 会自动在当前目录及一级子目录中查找 `novel.json`。如果返回已有项目 → 自动恢复：
+每次会话启动时先执行 `dickens_status(projectPath: ".")`。`dickens_status` 会自动在当前目录及一级子目录中查找 `novel.json`。
 
-**重要**：所有 `dickens_*` 工具调用统一使用 `projectPath: "."` 指代当前工作目录。`dickens_init` 会直接在当前目录创建项目结构（不创建子目录）。
+- 如果只找到 1 个项目 → 自动恢复该项目
+- 如果找到多个项目 → 列出所有项目，请用户选择后再恢复
+- 如果未找到任何项目 → 提示用户使用 `/start-novel` 创建新项目
+
+**重要**：`dickens_init` 会在工作目录下新建一个以小说标题命名的子目录存放所有项目文件。所有后续 `dickens_*` 工具调用统一使用 `projectPath: "."` —— 自动发现机制会定位到正确的子目录。如果工作目录下有多个小说项目，需要指定具体的子目录名称作为 `projectPath`。
 
 **恢复顺序**：dickens_status → dickens_outline (synopsis/structure/current arc) → dickens_character (list + 主角 read) → dickens_world → dickens_summary (global + recent 3) → dickens_consistency (open threads / recent events / terms / world state / factions / secrets)
 

@@ -52,14 +52,15 @@ export function createNovelInitTool(baseDir: string) {
     },
     async execute(args, context) {
       try {
-        const novelDir = context.directory || baseDir
+        const baseDirectory = context.directory || baseDir
+        const novelDir = path.join(baseDirectory, args.title)
 
         const existing = await fs
           .access(path.join(novelDir, "novel.json"))
           .then(() => true)
           .catch(() => false)
         if (existing) {
-          return `A novel project already exists in ${novelDir}. Use dickens_status to check its state.`
+          return `Novel project "${args.title}" already exists at ${novelDir}. Use dickens_status to check its state.`
         }
 
         for (const dir of NOVEL_DIR_STRUCTURE) {
@@ -212,7 +213,7 @@ export function createNovelInitTool(baseDir: string) {
           `Language: ${project.language}`,
           `POV: ${project.style.pov} | Tense: ${project.style.tense}`,
           "",
-          "All subsequent dickens_* tool calls should use projectPath = \".\" since the project lives in the current directory.",
+          `All subsequent dickens_* tool calls should use projectPath = "." — the auto-discovery will find the project in the "${args.title}" subdirectory.`,
         ].join("\n")
       } catch (e) {
         return `Error in dickens_init: ${(e as Error).message}`

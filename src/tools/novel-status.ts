@@ -3,7 +3,7 @@ import { promises as fs } from "fs"
 import path from "path"
 import type { NovelProject } from "../models/novel.js"
 import type { WriterState } from "../models/outline.js"
-import { resolveProjectDir } from "./resolve-project.js"
+import { resolveProjectDir, discoverAllProjects } from "./resolve-project.js"
 
 export function createNovelStatusTool(baseDir: string) {
   return tool({
@@ -16,10 +16,31 @@ export function createNovelStatusTool(baseDir: string) {
     },
     async execute(args, context) {
       try {
-        const projectDir = await resolveProjectDir(args.projectPath, context.directory, baseDir)
-        if (!projectDir) {
+        const parentDir = path.isAbsolute(args.projectPath)
+          ? args.projectPath
+          : path.join(context.directory || baseDir, args.projectPath)
+
+        const allProjects = await discoverAllProjects(parentDir)
+
+        const directCheck = path.join(parentDir, "novel.json")
+        const directExists = await fs.access(directCheck).then(() => true).catch(() => false)
+        if (directExists) allProjects.unshift(parentDir)
+
+        if (allProjects.length === 0) {
           return `No novel project found at ${args.projectPath} (also checked child directories). Use dickens_init to create one.`
         }
+
+        if (allProjects.length > 1) {
+          const listing = allProjects.map((p, i) => `  ${i + 1}. ${path.basename(p)} → ${p}`).join("\n")
+          return [
+            `Found ${allProjects.length} novel projects under ${parentDir}:`,
+            listing,
+            "",
+            `Use dickens_status with projectPath pointing to a specific project directory (e.g. projectPath="${path.basename(allProjects[0])}") to see its status.`,
+          ].join("\n")
+        }
+
+        const projectDir = allProjects[0]
 
         const novelJsonPath = path.join(projectDir, "novel.json")
         const statePath = path.join(projectDir, ".writer-state.json")

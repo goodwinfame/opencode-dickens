@@ -5,9 +5,9 @@ import path from "path"
  * Resolve the actual novel project directory from a given path.
  * 1. Check if novel.json exists directly at the given path
  * 2. If not, scan immediate child directories for novel.json
- * This ensures backward compatibility with old-style projects
- * (created in a subdirectory) and new-style projects (created
- * directly in the working directory).
+ *    - If exactly one child has novel.json, return it
+ *    - If multiple children have novel.json, return the first one
+ *      (use discoverAllProjects() for the full list)
  */
 export async function resolveProjectDir(
   projectPath: string,
@@ -22,16 +22,26 @@ export async function resolveProjectDir(
   const exists = await fs.access(directCheck).then(() => true).catch(() => false)
   if (exists) return rawDir
 
+  const projects = await discoverAllProjects(rawDir)
+  return projects.length > 0 ? projects[0] : null
+}
+
+/**
+ * Scan immediate child directories for novel.json files.
+ * Returns all found project directories (sorted by name).
+ */
+export async function discoverAllProjects(parentDir: string): Promise<string[]> {
+  const found: string[] = []
   try {
-    const entries = await fs.readdir(rawDir, { withFileTypes: true })
+    const entries = await fs.readdir(parentDir, { withFileTypes: true })
     for (const entry of entries) {
       if (!entry.isDirectory()) continue
-      const subCheck = path.join(rawDir, entry.name, "novel.json")
+      const subCheck = path.join(parentDir, entry.name, "novel.json")
       const subExists = await fs.access(subCheck).then(() => true).catch(() => false)
-      if (subExists) return path.join(rawDir, entry.name)
+      if (subExists) found.push(path.join(parentDir, entry.name))
     }
   } catch {
     // directory unreadable
   }
-  return null
+  return found.sort()
 }
