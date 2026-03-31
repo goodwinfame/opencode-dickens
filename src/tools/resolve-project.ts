@@ -1,29 +1,67 @@
 import { promises as fs } from "fs"
 import path from "path"
 
+export interface ResolveResult {
+  projectDir: string | null
+  diagnostics: string
+}
+
 /**
- * Resolve the actual novel project directory from a given path.
- * 1. Check if novel.json exists directly at the given path
- * 2. If not, scan immediate child directories for novel.json
- *    - If exactly one child has novel.json, return it
- *    - If multiple children have novel.json, return the first one
- *      (use discoverAllProjects() for the full list)
+ * Resolve the actual novel project directory from a given path,
+ * returning both the resolved path and human-readable diagnostics.
  */
 export async function resolveProjectDir(
   projectPath: string,
   contextDirectory: string,
   baseDir: string,
-): Promise<string | null> {
+): Promise<ResolveResult> {
   const rawDir = path.isAbsolute(projectPath)
     ? projectPath
     : path.join(contextDirectory || baseDir, projectPath)
 
   const directCheck = path.join(rawDir, "novel.json")
   const exists = await fs.access(directCheck).then(() => true).catch(() => false)
-  if (exists) return rawDir
+  if (exists) {
+    return {
+      projectDir: rawDir,
+      diagnostics: `Found novel.json at ${rawDir}`,
+    }
+  }
 
   const projects = await discoverAllProjects(rawDir)
-  return projects.length > 0 ? projects[0] : null
+
+  if (projects.length === 1) {
+    return {
+      projectDir: projects[0],
+      diagnostics: `Not at ${rawDir}. Found in subdirectory: ${path.basename(projects[0])}`,
+    }
+  }
+
+  if (projects.length > 1) {
+    const names = projects.map((p) => path.basename(p))
+    return {
+      projectDir: projects[0],
+      diagnostics: `Multiple projects under ${rawDir}: [${names.join(", ")}]. Using first: ${names[0]}`,
+    }
+  }
+
+  let subdirNames: string[] = []
+  try {
+    const entries = await fs.readdir(rawDir, { withFileTypes: true })
+    subdirNames = entries.filter((e) => e.isDirectory()).map((e) => e.name)
+  } catch {
+    return {
+      projectDir: null,
+      diagnostics: `Directory unreadable or does not exist: ${rawDir}`,
+    }
+  }
+
+  return {
+    projectDir: null,
+    diagnostics: subdirNames.length === 0
+      ? `No novel.json at ${rawDir} and no subdirectories found`
+      : `No novel.json at ${rawDir}. Scanned ${subdirNames.length} subdirs: [${subdirNames.join(", ")}]. None contain novel.json`,
+  }
 }
 
 /**

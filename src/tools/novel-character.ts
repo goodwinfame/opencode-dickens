@@ -30,8 +30,8 @@ export function createNovelCharacterTool(baseDir: string) {
     },
     async execute(args, context) {
       try {
-        const projectDir = await resolveProjectDir(args.projectPath, context.directory, baseDir)
-        if (!projectDir) return `Error: No novel project found. Use dickens_init first.`
+        const { projectDir, diagnostics } = await resolveProjectDir(args.projectPath, context.directory, baseDir)
+        if (!projectDir) return `Error: No novel project found. ${diagnostics}`
 
         const charsDir = path.join(projectDir, "characters")
         const indexPath = path.join(charsDir, "index.json")

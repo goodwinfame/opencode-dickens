@@ -8,9 +8,10 @@ import { createNovelSummaryTool } from "./novel-summary.js"
 import { createNovelConsistencyTool } from "./novel-consistency.js"
 import { createNovelExportTool } from "./novel-export.js"
 import { createNovelContextTool } from "./novel-context.js"
+import { wrapWithLogging } from "./logger.js"
 
 export function createNovelTools(baseDir: string) {
-  return {
+  const raw = {
     dickens_init: createNovelInitTool(baseDir),
     dickens_status: createNovelStatusTool(baseDir),
     dickens_write_chapter: createNovelWriteTool(baseDir),
@@ -22,4 +23,10 @@ export function createNovelTools(baseDir: string) {
     dickens_export: createNovelExportTool(baseDir),
     dickens_context: createNovelContextTool(baseDir),
   }
+
+  const wrapped: Record<string, ReturnType<typeof wrapWithLogging>> = {}
+  for (const [name, tool] of Object.entries(raw)) {
+    wrapped[name] = wrapWithLogging(name, tool, baseDir)
+  }
+  return wrapped
 }
